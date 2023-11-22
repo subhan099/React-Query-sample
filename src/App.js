@@ -1,23 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
-
+// import logo from "./logo.svg";
+import "./App.css";
+import { useQuery } from "react-query";
+import axios from "axios";
 function App() {
+  const { isLoading, error, data } = useQuery("Random Pictures", async () => {
+    try {
+      const response = await axios("https://random.dog/woof.json");
+      console.log("API Response:", response.data); // Log the response data
+      return response.data;
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
+    }
+  });
+  if (error) {
+    return (
+      <div>
+        <h1>Error {error.message}, try again!</h1>
+      </div>
+    );
+  }
+  if (isLoading) {
+    return (
+      <div>
+        <h1>Loading...</h1>
+      </div>
+    );
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {data.url ? (
+        <img src={data.url} alt="Random Dog" />
+      ) : (
+        <p>No image URL available</p>
+      )}
     </div>
   );
 }
